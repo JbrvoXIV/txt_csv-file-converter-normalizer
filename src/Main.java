@@ -15,7 +15,10 @@ public class Main {
             sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
             while(sc.hasNext()) {
                 try {
-                    pw.write(sc.next() + "\t");
+                    if(sc.hasNext("\n"))
+                        pw.write(sc.next());
+                    else
+                        pw.write(sc.next() + "\t");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -24,7 +27,10 @@ public class Main {
             sc.useDelimiter("(\t|\n)");
             while(sc.hasNext()) {
                 try {
-                    pw.write(sc.next() + ",");
+                    if(sc.hasNext("\n"))
+                        pw.write(sc.next());
+                    else
+                        pw.write(sc.next() + ",");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -40,6 +46,11 @@ public class Main {
         File file;
 
         try {
+
+            File srcFileExists = new File(out + "/" + src);
+            if(!srcFileExists.exists())
+                throw new Exception("SOURCE FILE NOT FOUND, PLEASE CREATE ONE AND TRY AGAIN");
+
             if(src.contains(".csv")) { // convert from .txt to .csv
                 if(dst.contains(".txt")) {
                     sc = new Scanner(new File(out + "/" + src));
@@ -75,18 +86,18 @@ public class Main {
         while(true) {
             try {
                 String[] str = user.nextLine().split(" ");
-
-                File srcFile = new File(out + "/" + str[1]);
-
-                if(!srcFile.exists()) {
-                    throw new Exception("SOURCE FILE DOES NOT EXIST, PLEASE CREATE ONE");
-                }
-
                 switch(str[0]) {
                     case "convert":
-                        convertFile(str[1], str[2]);
+                        if(str.length == 3)
+                            convertFile(str[1], str[2]);
+                        else
+                            throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");
                         break;
                     case "normalize":
+                        if(str.length == 3)
+                            convertFile(str[1], str[2]);
+                        else
+                            throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");                     
                         System.out.println("OUTPUTTED NORMALIZE");
                         break;
                     case "quit":
