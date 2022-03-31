@@ -9,6 +9,7 @@ public class Main {
     public static Scanner sc;
     public static PrintWriter pw;
     public static File file;
+
     public static void main(String[] args) throws FileNotFoundException {
         
         Scanner user = new Scanner(System.in);
@@ -26,6 +27,8 @@ public class Main {
                             file = new File(out + "/" + str[2]);
                             pw = new PrintWriter(file);
                             break;
+                        } else if(str[2].contains(".csv")) {
+                            throw new Exception("SAME I/O, FILE'S CONTENTS DO NOT CHANGE");
                         } else {
                             throw new Exception("CANNOT CONVERT FROM .csv TO NON .txt FILE");
                         }
@@ -38,6 +41,8 @@ public class Main {
                             file = new File(out + "/" + str[2]);
                             pw = new PrintWriter(file);
                             break;
+                        } else if(str[2].contains(".txt")) {
+                            throw new Exception("SAME I/O, FILE'S CONTENTS DO NOT CHANGE");
                         } else {
                             throw new Exception("CANNOT CONVERT FROM .txt TO NON .csv FILE");
                         }
