@@ -6,55 +6,13 @@ import java.util.Scanner;
 public class Main {
 
     public static String out = System.getProperty("user.dir");
-    public static Scanner sc;
-    public static PrintWriter pw;
-    public static File file;
-    public static void main(String[] args) throws FileNotFoundException {
-        
-        Scanner user = new Scanner(System.in);
+    
+    public static void writeToFile(File file, Scanner sc) throws FileNotFoundException {
 
-        while(true) {
-            try {
-                String[] str = user.nextLine().split(" ");
-
-                if(str[0].equals("convert")) {
-                    
-                    if(str[1].contains(".csv")) { // convert from .txt to .csv
-                        if(str[2].contains(".txt")) {
-                            sc = new Scanner(new File(out + "/" + str[1]));
-                            sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                            file = new File(out + "/" + str[2]);
-                            pw = new PrintWriter(file);
-                            break;
-                        } else {
-                            throw new Exception("CANNOT CONVERT FROM .csv TO NON .txt FILE");
-                        }
-                    }
-                    
-                    if(str[1].contains(".txt")) { // convert from .txt to .csv
-                        if(str[2].contains(".csv")) {
-                            sc = new Scanner(new File(out + "/" + str[1]));
-                            sc.useDelimiter("\t");
-                            file = new File(out + "/" + str[2]);
-                            pw = new PrintWriter(file);
-                            break;
-                        } else {
-                            throw new Exception("CANNOT CONVERT FROM .txt TO NON .csv FILE");
-                        }
-                    }
-                }
-
-                if(str[0].equals("quit")) {
-                    System.out.println("Terminating program...");
-                    System.exit(1);
-                }
-
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
+        PrintWriter pw = new PrintWriter(file);
 
         if(file.getName().contains(".txt")) {
+            sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
             while(sc.hasNext()) {
                 try {
                     pw.write(sc.next() + "\t");
@@ -63,6 +21,7 @@ public class Main {
                 }
             }
         } else {
+            sc.useDelimiter("(\t|\n)");
             while(sc.hasNext()) {
                 try {
                     pw.write(sc.next() + ",");
@@ -72,6 +31,75 @@ public class Main {
             }
         }
         pw.close();
-        user.close();
+        sc.close();
+    }
+
+    public static void convertFile(String src, String dst) {
+        
+        Scanner sc;
+        File file;
+
+        try {
+            if(src.contains(".csv")) { // convert from .txt to .csv
+                if(dst.contains(".txt")) {
+                    sc = new Scanner(new File(out + "/" + src));
+                    file = new File(out + "/" + dst);
+                    writeToFile(file, sc);
+                } else if(dst.contains(".csv")) {
+                    throw new Exception("SAME I/O, FILE'S CONTENTS DO NOT CHANGE");
+                } else {
+                    throw new Exception("CANNOT CONVERT FROM .csv TO NON .txt FILE");
+                }
+            }
+            
+            if(src.contains(".txt")) { // convert from .txt to .csv
+                if(dst.contains(".csv")) {
+                    sc = new Scanner(new File(out + "/" + src));
+                    file = new File(out + "/" + dst);
+                    writeToFile(file, sc);
+                } else if(dst.contains(".txt")) {
+                    throw new Exception("SAME I/O, FILE'S CONTENTS DO NOT CHANGE");
+                } else {
+                    throw new Exception("CANNOT CONVERT FROM .txt TO NON .csv FILE");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        
+        Scanner user = new Scanner(System.in);
+
+        while(true) {
+            try {
+                String[] str = user.nextLine().split(" ");
+
+                File srcFile = new File(out + "/" + str[1]);
+
+                if(!srcFile.exists()) {
+                    throw new Exception("SOURCE FILE DOES NOT EXIST, PLEASE CREATE ONE");
+                }
+
+                switch(str[0]) {
+                    case "convert":
+                        convertFile(str[1], str[2]);
+                        break;
+                    case "normalize":
+                        System.out.println("OUTPUTTED NORMALIZE");
+                        break;
+                    case "quit":
+                        System.out.println("Terminating program...");
+                        user.close();
+                        System.exit(1);
+                        break;
+                    default:
+                        throw new Exception("UNKNOWN COMMAND, PLEASE TRY AGAIN");
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 }
