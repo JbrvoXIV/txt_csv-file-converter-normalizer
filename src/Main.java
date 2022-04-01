@@ -8,34 +8,106 @@ public class Main {
 
     public static String out = System.getProperty("user.dir");
     
-    public static void normalizeFile(String src) throws FileNotFoundException {
+    public static void normalizeCSV(String src) throws FileNotFoundException {
 
         File file = new File(out + "/" + src);
         Scanner sc = new Scanner(file);
+        Scanner lineScanner;
         ArrayList<String> fileContents = new ArrayList<String>();
 
-        sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
         while(sc.hasNext()) {
-            fileContents.add(sc.next());
+            lineScanner = new Scanner(sc.nextLine());
+            lineScanner.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            while(lineScanner.hasNext()) {
+                fileContents.add(lineScanner.next());
+            }
+            if(sc.hasNextLine()) {
+                fileContents.add("\n");
+            }
         }
 
         PrintWriter pw = new PrintWriter(file);
-        for(int i = 0; i < fileContents.size(); i++) {
-            String content = fileContents.get(i);
+        for(int i = 1; i <= fileContents.size(); i++) {
+            String content = fileContents.get(i - 1);
+            boolean includeComma;
+            if(i == fileContents.size()) {
+                includeComma = false;
+            } else {
+                includeComma = !fileContents.get(i).equals("\n") && !fileContents.get(i - 1).equals("\n");
+            }
             try {
                 int val = Integer.parseInt(content);
-                pw.write(String.valueOf(val) + (i < fileContents.size() - 1 ? "," : ""));
+                pw.printf("%+010d" + (includeComma ? "," : ""), val);
             } catch (NumberFormatException e) {
                 try {
                     double val = Double.parseDouble(content);
-                    pw.write(String.valueOf(val) + (i < fileContents.size() - 1 ? "," : ""));
+                    if(val > 100 || val < 0.01)
+                        pw.printf("%.2e" + (includeComma ? "," : ""), val);
+                    else
+                        pw.print(val + (includeComma ? "," : ""));
                 } catch (NumberFormatException f) {
-                    pw.write(content + (i < fileContents.size() - 1 ? "," : ""));
+                    if(content.length() > 13)
+                        pw.printf("%.10s..." + (includeComma ? "," : ""), content);
+                    else if(content.length() == 0)
+                        pw.print("N/A" + (includeComma ? "," : ""));
+                    else
+                        pw.print(content + (includeComma ? "," : ""));
                 }
             }
         }
         pw.close();
         sc.close();
+    }
+
+    public static void normalizeTXT(String src) throws FileNotFoundException {
+
+        File file = new File(out + "/" + src);
+        Scanner sc = new Scanner(file);
+        Scanner lineScanner;
+        ArrayList<String> fileContents = new ArrayList<String>();
+
+        while(sc.hasNext()) {
+            lineScanner = new Scanner(sc.nextLine());
+            lineScanner.useDelimiter("\t");
+            while(lineScanner.hasNext()) {
+                fileContents.add(lineScanner.next());
+            }
+            if(sc.hasNextLine()) {
+                fileContents.add("\n");
+            }
+        }
+
+        PrintWriter pw = new PrintWriter(file);
+        for(int i = 1; i <= fileContents.size(); i++) {
+            String content = fileContents.get(i - 1);
+            boolean includeComma;
+            if(i == fileContents.size()) {
+                includeComma = false;
+            } else {
+                includeComma = !fileContents.get(i).equals("\n") && !fileContents.get(i - 1).equals("\n");
+            }
+            try {
+                int val = Integer.parseInt(content);
+                pw.printf("%+010d" + (includeComma ? "\t" : ""), val);
+            } catch (NumberFormatException e) {
+                try {
+                    double val = Double.parseDouble(content);
+                    if(val > 100 || val < 0.01)
+                        pw.printf("%.2e" + (includeComma ? "\t" : ""), val);
+                    else
+                        pw.print(val + (includeComma ? "\t" : ""));
+                } catch (NumberFormatException f) {
+                    if(content.length() > 13)
+                        pw.printf("%.10s..." + (includeComma ? "\t" : ""), content);
+                    else if(content.length() == 0)
+                        pw.print("N/A" + (includeComma ? "\t" : ""));
+                    else
+                        pw.print(content + (includeComma ? "\t" : ""));
+                }
+            }
+        }
+        pw.close();
+        sc.close();  
     }
 
     public static void writeToFile(File file, Scanner sc) throws FileNotFoundException {
@@ -110,6 +182,12 @@ public class Main {
 
         while(true) {
             try {
+                System.out.println(
+                    "\nPlease enter one of the three commands:\n"
+                    + "1) convert yourfilename.xxx yourfilename.yyy\n"
+                    + "2) normalize yourfilename.xxx\n"
+                    + "3) quit\n"
+                );
                 String[] str = user.nextLine().split(" ");
                 switch(str[0]) {
                     case "convert":
@@ -119,8 +197,12 @@ public class Main {
                             throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");
                         break;
                     case "normalize":
-                        if(str.length == 2)
-                            normalizeFile(str[1]);
+                        if(str.length == 2) {
+                            if(str[1].contains(".csv"))
+                                normalizeCSV(str[1]);
+                            else
+                                normalizeTXT(str[1]);
+                        }
                         else
                             throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");                     
                         break;
@@ -133,7 +215,7 @@ public class Main {
                         throw new Exception("UNKNOWN COMMAND, PLEASE TRY AGAIN");
                 }
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + "\n");
             }
         }
     }
