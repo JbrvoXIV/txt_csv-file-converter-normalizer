@@ -15,22 +15,16 @@ public class Main {
             sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
             while(sc.hasNext()) {
                 try {
-                    if(sc.hasNext("\n"))
-                        pw.write(sc.next());
-                    else
-                        pw.write(sc.next() + "\t");
+                    pw.write(sc.next() + (sc.hasNext() ? "\t" : ""));
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
             }
         } else {
-            sc.useDelimiter("(\t|\n)");
+            sc.useDelimiter("\t");
             while(sc.hasNext()) {
                 try {
-                    if(sc.hasNext("\n"))
-                        pw.write(sc.next());
-                    else
-                        pw.write(sc.next() + ",");
+                    pw.write(sc.next() + (sc.hasNext() ? "," : ""));
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -94,8 +88,8 @@ public class Main {
                             throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");
                         break;
                     case "normalize":
-                        if(str.length == 3)
-                            convertFile(str[1], str[2]);
+                        if(str.length == 2)
+                            System.out.println("ENTERED NORMALIZE");
                         else
                             throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");                     
                         System.out.println("OUTPUTTED NORMALIZE");
