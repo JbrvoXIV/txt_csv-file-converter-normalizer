@@ -1,12 +1,43 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static String out = System.getProperty("user.dir");
     
+    public static void normalizeFile(String src) throws FileNotFoundException {
+
+        File file = new File(out + "/" + src);
+        Scanner sc = new Scanner(file);
+        ArrayList<String> fileContents = new ArrayList<String>();
+
+        sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+        while(sc.hasNext()) {
+            fileContents.add(sc.next());
+        }
+
+        PrintWriter pw = new PrintWriter(file);
+        for(int i = 0; i < fileContents.size(); i++) {
+            String content = fileContents.get(i);
+            try {
+                int val = Integer.parseInt(content);
+                pw.write(String.valueOf(val) + (i < fileContents.size() - 1 ? "," : ""));
+            } catch (NumberFormatException e) {
+                try {
+                    double val = Double.parseDouble(content);
+                    pw.write(String.valueOf(val) + (i < fileContents.size() - 1 ? "," : ""));
+                } catch (NumberFormatException f) {
+                    pw.write(content + (i < fileContents.size() - 1 ? "," : ""));
+                }
+            }
+        }
+        pw.close();
+        sc.close();
+    }
+
     public static void writeToFile(File file, Scanner sc) throws FileNotFoundException {
 
         PrintWriter pw = new PrintWriter(file);
@@ -89,10 +120,9 @@ public class Main {
                         break;
                     case "normalize":
                         if(str.length == 2)
-                            System.out.println("ENTERED NORMALIZE");
+                            normalizeFile(str[1]);
                         else
                             throw new Exception("CORRECT COMMAND WITH INCORRECT FORMAT INPUTTED, PLEASE TRY AGAIN");                     
-                        System.out.println("OUTPUTTED NORMALIZE");
                         break;
                     case "quit":
                         System.out.println("Terminating program...");
