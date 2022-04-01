@@ -8,14 +8,14 @@ public class Main {
 
     public static String out = System.getProperty("user.dir");
     
-    public static void normalizeCSV(String src) throws FileNotFoundException {
+    public static void normalizeCSV(String src) throws FileNotFoundException { // normalizes .csv files
 
         File file = new File(out + "/" + src);
         Scanner sc = new Scanner(file);
         Scanner lineScanner;
         ArrayList<String> fileContents = new ArrayList<String>();
 
-        while(sc.hasNext()) {
+        while(sc.hasNext()) { // scans each line in file, adding each value separately from newline and breaks to arraylist
             lineScanner = new Scanner(sc.nextLine());
             lineScanner.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
             while(lineScanner.hasNext()) {
@@ -27,15 +27,15 @@ public class Main {
         }
 
         PrintWriter pw = new PrintWriter(file);
-        for(int i = 1; i <= fileContents.size(); i++) {
+        for(int i = 1; i <= fileContents.size(); i++) { // scans through each index, converting to appropriate type and including commas where needed
             String content = fileContents.get(i - 1);
             boolean includeComma;
-            if(i == fileContents.size()) {
+            if(i == fileContents.size()) { // checks to see if comma is needed based on breaks
                 includeComma = false;
             } else {
                 includeComma = !fileContents.get(i).equals("\n") && !fileContents.get(i - 1).equals("\n");
             }
-            try {
+            try { // parses each value from arraylist into it's data type and "normalizes" back to same file
                 int val = Integer.parseInt(content);
                 pw.printf("%+010d" + (includeComma ? "," : ""), val);
             } catch (NumberFormatException e) {
@@ -59,14 +59,14 @@ public class Main {
         sc.close();
     }
 
-    public static void normalizeTXT(String src) throws FileNotFoundException {
+    public static void normalizeTXT(String src) throws FileNotFoundException { // normalizes .txt file
 
         File file = new File(out + "/" + src);
         Scanner sc = new Scanner(file);
         Scanner lineScanner;
         ArrayList<String> fileContents = new ArrayList<String>();
 
-        while(sc.hasNext()) {
+        while(sc.hasNext()) { // scans each line in file, adding each value separately from newline and breaks to arraylist
             lineScanner = new Scanner(sc.nextLine());
             lineScanner.useDelimiter("\t");
             while(lineScanner.hasNext()) {
@@ -78,15 +78,15 @@ public class Main {
         }
 
         PrintWriter pw = new PrintWriter(file);
-        for(int i = 1; i <= fileContents.size(); i++) {
+        for(int i = 1; i <= fileContents.size(); i++) { // scans through each index, converting to appropriate type and including commas where needed
             String content = fileContents.get(i - 1);
             boolean includeComma;
-            if(i == fileContents.size()) {
+            if(i == fileContents.size()) { // checks to see if comma is needed based on breaks
                 includeComma = false;
             } else {
                 includeComma = !fileContents.get(i).equals("\n") && !fileContents.get(i - 1).equals("\n");
             }
-            try {
+            try { // parses each value from arraylist into it's data type and "normalizes" back to same file
                 int val = Integer.parseInt(content);
                 pw.printf("%+010d" + (includeComma ? "\t" : ""), val);
             } catch (NumberFormatException e) {
@@ -114,8 +114,8 @@ public class Main {
 
         PrintWriter pw = new PrintWriter(file);
 
-        if(file.getName().contains(".txt")) {
-            sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+        if(file.getName().contains(".txt")) { // writes from .csv to .txt
+            sc.useDelimiter(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)"); // delimiter for commas, ignore comma inside quotes
             while(sc.hasNext()) {
                 try {
                     pw.write(sc.next() + (sc.hasNext() ? "\t" : ""));
@@ -123,7 +123,7 @@ public class Main {
                     System.out.println(e.getMessage());
                 }
             }
-        } else {
+        } else { // writes from .txt to .csv
             sc.useDelimiter("\t");
             while(sc.hasNext()) {
                 try {
@@ -189,7 +189,7 @@ public class Main {
                     + "3) quit\n"
                 );
                 String[] str = user.nextLine().split(" ");
-                switch(str[0]) {
+                switch(str[0]) { // input handler for each option
                     case "convert":
                         if(str.length == 3)
                             convertFile(str[1], str[2]);
